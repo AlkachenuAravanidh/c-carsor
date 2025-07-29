@@ -278,17 +278,36 @@ export default function ModernAnalyticsDashboard({ activeTab = 'overview' }: Mod
         return;
       }
 
+      // Create comprehensive export data
       const exportData = {
         generatedAt: new Date().toISOString(),
+        reportTitle: 'Carsor AI Analytics Report',
+        summary: {
+          totalIssues: data.overview.totalIssues,
+          resolutionRate: data.overview.totalIssues > 0 ? Math.round((data.overview.resolvedIssues / data.overview.totalIssues) * 100) : 0,
+          avgResolutionTime: data.overview.avgResolutionTime,
+          criticalIssuesPercentage: data.overview.totalIssues > 0 ? Math.round((data.overview.criticalIssues / data.overview.totalIssues) * 100) : 0
+        },
         overview: data.overview,
         issuesByModel: data.issuesByModel,
         issuesByCategory: data.issuesByCategory,
         monthlyTrends: data.monthlyTrends,
         commonFlaws: data.commonFlaws,
         severityDistribution: data.severityDistribution,
-        rawIssues: issues
+        rawIssues: issues.map(issue => ({
+          id: issue._id,
+          description: issue.description,
+          category: issue.category,
+          severity: issue.severity,
+          status: issue.status,
+          vehicleModel: issue.vehicleModel,
+          createdAt: issue.createdAt,
+          resolvedAt: issue.resolvedAt || null,
+          userId: issue.userId
+        }))
       };
 
+      // Generate JSON export
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
         type: 'application/json'
       });
@@ -302,18 +321,20 @@ export default function ModernAnalyticsDashboard({ activeTab = 'overview' }: Mod
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
+      // Generate CSV export with better formatting
       // Also create CSV export for easier analysis
       const csvData = [
-        ['Issue ID', 'Description', 'Category', 'Severity', 'Status', 'Vehicle Model', 'Created Date', 'Resolved Date'],
+        ['Issue ID', 'Description', 'Category', 'Severity', 'Status', 'Vehicle Model', 'Created Date', 'Resolved Date', 'Days to Resolution'],
         ...issues.map(issue => [
           issue._id,
-          issue.description.replace(/,/g, ';'), // Replace commas to avoid CSV issues
+          `"${issue.description.replace(/"/g, '""')}"`, // Properly escape quotes for CSV
           issue.category,
           issue.severity,
           issue.status,
           issue.vehicleModel,
           new Date(issue.createdAt).toLocaleDateString(),
-          issue.resolvedAt ? new Date(issue.resolvedAt).toLocaleDateString() : 'Not resolved'
+          issue.resolvedAt ? new Date(issue.resolvedAt).toLocaleDateString() : 'Not resolved',
+          issue.resolvedAt ? Math.ceil((new Date(issue.resolvedAt).getTime() - new Date(issue.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 'N/A'
         ])
       ];
 
@@ -328,7 +349,16 @@ export default function ModernAnalyticsDashboard({ activeTab = 'overview' }: Mod
       document.body.removeChild(csvLink);
       URL.revokeObjectURL(csvUrl);
 
-      alert('Data exported successfully! Check your downloads folder for JSON and CSV files.');
+      // Show success message with details
+      const successMessage = `
+Data exported successfully! 
+
+Files generated:
+• analytics-report-${new Date().toISOString().split('T')[0]}.json (Complete data)
+• analytics-data-${new Date().toISOString().split('T')[0]}.csv (Spreadsheet format)
+
+Check your downloads folder.`;
+      alert(successMessage);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export data. Please try again.');
