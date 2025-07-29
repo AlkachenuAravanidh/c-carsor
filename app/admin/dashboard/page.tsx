@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Users, Wrench, Plus, Edit, Trash2, Eye, EyeOff, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Shield, Users, Wrench, Plus, Edit, Trash2, Eye, EyeOff, LogOut, Car, Settings, Activity, Database, Server, Lock } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
 interface User {
@@ -34,7 +34,6 @@ export default function AdminDashboard() {
   const [serviceProviders, setServiceProviders] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddingProvider, setIsAddingProvider] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [newProvider, setNewProvider] = useState({
     name: '',
@@ -143,10 +142,11 @@ export default function AdminDashboard() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading admin dashboard...</p>
+          <div className="w-16 h-16 border-4 border-red-400 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <p className="text-xl font-medium text-white">Loading Admin Dashboard...</p>
+          <p className="text-gray-400 mt-2">Initializing system controls...</p>
         </div>
       </div>
     );
@@ -157,75 +157,108 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -inset-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000"></div>
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,119,119,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,119,119,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+      </div>
+
       {/* Header */}
-      <div className="bg-white shadow-lg border-b">
+      <header className="relative z-10 bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 overflow-hidden">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Shield className="w-5 h-5 text-white" />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-pulse border-2 border-black"></div>
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                  AutoDoc AI Admin
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-red-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                  Carsor AI Admin
                 </h1>
-                <p className="text-xs text-gray-500">System Administration</p>
+                <p className="text-xs text-gray-400 font-medium">System Administration Panel</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">
-                Administrator
-              </Badge>
-              <span className="text-sm text-gray-600 hidden sm:block">Welcome, {session.user?.name}</span>
-              <Button variant="outline" size="sm" onClick={() => signOut({ callbackUrl: '/' })} className="border-red-200 text-red-600 hover:bg-red-50">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/10">
+                <Avatar className="w-10 h-10 border-2 border-red-400/30">
+                  <AvatarFallback className="bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold">
+                    {session.user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-white font-semibold">{session.user?.name}</p>
+                  <Badge className="bg-red-500/20 text-red-300 border-red-400/30 text-xs">
+                    Administrator
+                  </Badge>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => signOut({ callbackUrl: '/' })} 
+                className="border-red-400/30 text-red-400 hover:bg-red-500/10 rounded-2xl"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Logout</span>
+                Sign Out
               </Button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">System Administration</h2>
-          <p className="text-gray-600">Manage users, service providers, and system settings</p>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-2">
+            System Administration
+          </h2>
+          <p className="text-gray-400 text-lg">Manage users, service providers, and system settings</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl hover:bg-black/30 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <Users className="w-8 h-8" />
+                <div className="w-14 h-14 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center">
+                  <Users className="w-8 h-8 text-blue-400" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{users.length}</p>
-                  <p className="text-blue-100">Vehicle Owners</p>
+                  <p className="text-3xl font-bold text-white">{users.length}</p>
+                  <p className="text-blue-200 font-medium">Vehicle Owners</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl hover:bg-black/30 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <Wrench className="w-8 h-8" />
+                <div className="w-14 h-14 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center">
+                  <Wrench className="w-8 h-8 text-green-400" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{serviceProviders.length}</p>
-                  <p className="text-green-100">Service Providers</p>
+                  <p className="text-3xl font-bold text-white">{serviceProviders.length}</p>
+                  <p className="text-green-200 font-medium">Service Providers</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl hover:bg-black/30 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <Shield className="w-8 h-8" />
+                <div className="w-14 h-14 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center">
+                  <Database className="w-8 h-8 text-purple-400" />
+                </div>
                 <div>
-                  <p className="text-2xl font-bold">{users.length + serviceProviders.length}</p>
-                  <p className="text-purple-100">Total Users</p>
+                  <p className="text-3xl font-bold text-white">{users.length + serviceProviders.length}</p>
+                  <p className="text-purple-200 font-medium">Total Users</p>
                 </div>
               </div>
             </CardContent>
@@ -233,263 +266,484 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users">Vehicle Owners</TabsTrigger>
-            <TabsTrigger value="providers">Service Providers</TabsTrigger>
-            <TabsTrigger value="settings">System Settings</TabsTrigger>
+          <TabsList className="bg-black/20 backdrop-blur-xl border border-white/10 p-1 rounded-2xl">
+            <TabsTrigger 
+              value="users" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/20 data-[state=active]:to-cyan-500/20 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 rounded-xl px-6 py-3"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Vehicle Owners
+            </TabsTrigger>
+            <TabsTrigger 
+              value="providers" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500/20 data-[state=active]:to-emerald-500/20 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-green-400/30 text-gray-400 rounded-xl px-6 py-3"
+            >
+              <Wrench className="w-4 h-4 mr-2" />
+              Service Providers
+            </TabsTrigger>
+            <TabsTrigger 
+              value="settings" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-purple-400/30 text-gray-400 rounded-xl px-6 py-3"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              System Settings
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <CardTitle>Vehicle Owners Management</CardTitle>
+            <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-b border-white/10 rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <span className="text-2xl font-bold text-white">Vehicle Owners Management</span>
+                    <p className="text-gray-400 font-normal">Manage customer accounts and profiles</p>
+                  </div>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {users.map((user) => (
-                    <div key={user._id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{user.name}</h4>
-                        <p className="text-sm text-gray-600">{user.email}</p>
-                        <p className="text-sm text-gray-500">
-                          Vehicle: {user.vehicleModel} • {user.vehicleRegistration}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Reset Password</DialogTitle>
-                              <DialogDescription>
-                                Enter a new password for {user.name}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={(e) => {
-                              e.preventDefault();
-                              const formData = new FormData(e.target as HTMLFormElement);
-                              const newPassword = formData.get('password') as string;
-                              handleUpdatePassword(user._id, newPassword);
-                            }}>
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="password">New Password</Label>
-                                  <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    minLength={8}
-                                  />
-                                </div>
-                                <Button type="submit" className="w-full">
-                                  Update Password
-                                </Button>
-                              </div>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleDeleteUser(user._id, 'vehicle_owner')}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  {users.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-400 text-lg">No vehicle owners registered yet</p>
                     </div>
-                  ))}
+                  ) : (
+                    users.map((user) => (
+                      <Card key={user._id} className="bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="w-12 h-12 border-2 border-blue-400/30">
+                                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold">
+                                  {user.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-white text-lg">{user.name}</h4>
+                                <p className="text-gray-400">{user.email}</p>
+                                <div className="flex items-center gap-4 mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <Car className="w-4 h-4 text-cyan-400" />
+                                    <span className="text-sm text-gray-300">{user.vehicleModel}</span>
+                                  </div>
+                                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-400/30 text-xs">
+                                    {user.vehicleRegistration}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex gap-3">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="border-orange-400/30 text-orange-400 hover:bg-orange-500/10 rounded-xl"
+                                  >
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Reset Password
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-black/90 backdrop-blur-xl border border-white/10">
+                                  <DialogHeader>
+                                    <DialogTitle className="text-white">Reset Password</DialogTitle>
+                                    <DialogDescription className="text-gray-400">
+                                      Enter a new password for {user.name}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const formData = new FormData(e.target as HTMLFormElement);
+                                    const newPassword = formData.get('password') as string;
+                                    handleUpdatePassword(user._id, newPassword);
+                                  }}>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <Label htmlFor="password" className="text-white">New Password</Label>
+                                        <Input
+                                          id="password"
+                                          name="password"
+                                          type="password"
+                                          required
+                                          minLength={8}
+                                          className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-orange-400"
+                                          placeholder="Enter new password (min 8 characters)"
+                                        />
+                                      </div>
+                                      <Button 
+                                        type="submit" 
+                                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl"
+                                      >
+                                        Update Password
+                                      </Button>
+                                    </div>
+                                  </form>
+                                </DialogContent>
+                              </Dialog>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteUser(user._id, 'vehicle_owner')}
+                                className="bg-red-500/20 border border-red-400/30 text-red-400 hover:bg-red-500/30 rounded-xl"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="providers">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Service Providers Management</CardTitle>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Service Provider
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Service Provider</DialogTitle>
-                      <DialogDescription>
-                        Create a new service provider account
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleAddProvider} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="name">Full Name</Label>
-                          <Input
-                            id="name"
-                            required
-                            value={newProvider.name}
-                            onChange={(e) => setNewProvider({ ...newProvider, name: e.target.value })}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            required
-                            value={newProvider.phone}
-                            onChange={(e) => setNewProvider({ ...newProvider, phone: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          required
-                          value={newProvider.email}
-                          onChange={(e) => setNewProvider({ ...newProvider, email: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative">
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            required
-                            minLength={8}
-                            value={newProvider.password}
-                            onChange={(e) => setNewProvider({ ...newProvider, password: e.target.value })}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="companyName">Company Name</Label>
-                        <Input
-                          id="companyName"
-                          required
-                          value={newProvider.companyName}
-                          onChange={(e) => setNewProvider({ ...newProvider, companyName: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="serviceLocation">Service Location</Label>
-                        <Input
-                          id="serviceLocation"
-                          required
-                          placeholder="City, State"
-                          value={newProvider.serviceLocation}
-                          onChange={(e) => setNewProvider({ ...newProvider, serviceLocation: e.target.value })}
-                        />
-                      </div>
-                      <Button type="submit" className="w-full" disabled={isAddingProvider}>
-                        {isAddingProvider ? 'Adding...' : 'Add Service Provider'}
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {serviceProviders.map((provider) => (
-                    <div key={provider._id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{provider.name}</h4>
-                        <p className="text-sm text-gray-600">{provider.email}</p>
-                        <p className="text-sm text-gray-500">
-                          {provider.companyName} • {provider.serviceLocation}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Reset Password</DialogTitle>
-                              <DialogDescription>
-                                Enter a new password for {provider.name}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={(e) => {
-                              e.preventDefault();
-                              const formData = new FormData(e.target as HTMLFormElement);
-                              const newPassword = formData.get('password') as string;
-                              handleUpdatePassword(provider._id, newPassword);
-                            }}>
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="password">New Password</Label>
-                                  <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    minLength={8}
-                                  />
-                                </div>
-                                <Button type="submit" className="w-full">
-                                  Update Password
-                                </Button>
-                              </div>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleDeleteUser(provider._id, 'service_provider')}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+            <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <CardHeader className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-white/10 rounded-t-3xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center">
+                      <Wrench className="w-6 h-6 text-green-400" />
                     </div>
-                  ))}
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white">Service Providers Management</CardTitle>
+                      <p className="text-gray-400 font-normal">Manage authorized service centers</p>
+                    </div>
+                  </div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl px-6 py-3 shadow-2xl">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Service Provider
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-black/90 backdrop-blur-xl border border-white/10 max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="text-white text-xl">Add New Service Provider</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                          Create a new authorized service provider account
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleAddProvider} className="space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="name" className="text-white">Full Name</Label>
+                            <Input
+                              id="name"
+                              required
+                              value={newProvider.name}
+                              onChange={(e) => setNewProvider({ ...newProvider, name: e.target.value })}
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400"
+                              placeholder="Provider name"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="phone" className="text-white">Phone</Label>
+                            <Input
+                              id="phone"
+                              required
+                              value={newProvider.phone}
+                              onChange={(e) => setNewProvider({ ...newProvider, phone: e.target.value })}
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400"
+                              placeholder="Phone number"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="email" className="text-white">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            required
+                            value={newProvider.email}
+                            onChange={(e) => setNewProvider({ ...newProvider, email: e.target.value })}
+                            className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400"
+                            placeholder="Email address"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="password" className="text-white">Password</Label>
+                          <div className="relative">
+                            <Input
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              required
+                              minLength={8}
+                              value={newProvider.password}
+                              onChange={(e) => setNewProvider({ ...newProvider, password: e.target.value })}
+                              className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400 pr-12"
+                              placeholder="Create secure password"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </Button>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="companyName" className="text-white">Company Name</Label>
+                          <Input
+                            id="companyName"
+                            required
+                            value={newProvider.companyName}
+                            onChange={(e) => setNewProvider({ ...newProvider, companyName: e.target.value })}
+                            className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400"
+                            placeholder="Service center name"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="serviceLocation" className="text-white">Service Location</Label>
+                          <Input
+                            id="serviceLocation"
+                            required
+                            placeholder="City, State"
+                            value={newProvider.serviceLocation}
+                            onChange={(e) => setNewProvider({ ...newProvider, serviceLocation: e.target.value })}
+                            className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-green-400"
+                          />
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl py-3" 
+                          disabled={isAddingProvider}
+                        >
+                          {isAddingProvider ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              Adding Provider...
+                            </div>
+                          ) : (
+                            'Add Service Provider'
+                          )}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  {serviceProviders.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Wrench className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-400 text-lg">No service providers registered yet</p>
+                    </div>
+                  ) : (
+                    serviceProviders.map((provider) => (
+                      <Card key={provider._id} className="bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="w-12 h-12 border-2 border-green-400/30">
+                                <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold">
+                                  {provider.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-white text-lg">{provider.name}</h4>
+                                <p className="text-gray-400">{provider.email}</p>
+                                <div className="flex items-center gap-4 mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-green-400" />
+                                    <span className="text-sm text-gray-300">{provider.companyName}</span>
+                                  </div>
+                                  <Badge className="bg-green-500/20 text-green-300 border-green-400/30 text-xs">
+                                    {provider.serviceLocation}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex gap-3">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="border-orange-400/30 text-orange-400 hover:bg-orange-500/10 rounded-xl"
+                                  >
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Reset Password
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-black/90 backdrop-blur-xl border border-white/10">
+                                  <DialogHeader>
+                                    <DialogTitle className="text-white">Reset Password</DialogTitle>
+                                    <DialogDescription className="text-gray-400">
+                                      Enter a new password for {provider.name}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const formData = new FormData(e.target as HTMLFormElement);
+                                    const newPassword = formData.get('password') as string;
+                                    handleUpdatePassword(provider._id, newPassword);
+                                  }}>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <Label htmlFor="password" className="text-white">New Password</Label>
+                                        <Input
+                                          id="password"
+                                          name="password"
+                                          type="password"
+                                          required
+                                          minLength={8}
+                                          className="bg-white/5 border-white/20 text-white placeholder:text-white/50 focus:border-orange-400"
+                                          placeholder="Enter new password (min 8 characters)"
+                                        />
+                                      </div>
+                                      <Button 
+                                        type="submit" 
+                                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl"
+                                      >
+                                        Update Password
+                                      </Button>
+                                    </div>
+                                  </form>
+                                </DialogContent>
+                              </Dialog>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteUser(provider._id, 'service_provider')}
+                                className="bg-red-500/20 border border-red-400/30 text-red-400 hover:bg-red-500/30 rounded-xl"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Settings</CardTitle>
+            <Card className="bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-white/10 rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <span className="text-2xl font-bold text-white">System Settings</span>
+                    <p className="text-gray-400 font-normal">Monitor system health and configuration</p>
+                  </div>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div className="p-4 border rounded-lg bg-blue-50">
-                    <h4 className="font-medium text-blue-900 mb-2">Database Status</h4>
-                    <p className="text-sm text-blue-700">Connected to MongoDB</p>
-                  </div>
+              <CardContent className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="bg-white/5 border border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                          <Database className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <h4 className="font-semibold text-white">Database Status</h4>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Connection</span>
+                          <Badge className="bg-green-500/20 text-green-300 border-green-400/30">Connected</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Type</span>
+                          <span className="text-white">MongoDB</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Collections</span>
+                          <span className="text-white">3 Active</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="p-4 border rounded-lg bg-green-50">
-                    <h4 className="font-medium text-green-900 mb-2">Authentication</h4>
-                    <p className="text-sm text-green-700">NextAuth.js configured and running</p>
-                  </div>
+                  <Card className="bg-white/5 border border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-green-400" />
+                        </div>
+                        <h4 className="font-semibold text-white">Authentication</h4>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Provider</span>
+                          <span className="text-white">NextAuth.js</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Security</span>
+                          <Badge className="bg-green-500/20 text-green-300 border-green-400/30">Secure</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Encryption</span>
+                          <span className="text-white">bcrypt</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   
-                  <div className="p-4 border rounded-lg bg-purple-50">
-                    <h4 className="font-medium text-purple-900 mb-2">AI Services</h4>
-                    <p className="text-sm text-purple-700">Voice processing and AI analysis active</p>
-                  </div>
+                  <Card className="bg-white/5 border border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center">
+                          <Activity className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <h4 className="font-semibold text-white">AI Services</h4>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Voice Processing</span>
+                          <Badge className="bg-green-500/20 text-green-300 border-green-400/30">Active</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">AI Analysis</span>
+                          <Badge className="bg-green-500/20 text-green-300 border-green-400/30">Running</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Provider</span>
+                          <span className="text-white">Gemini AI</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white/5 border border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center">
+                          <Server className="w-5 h-5 text-orange-400" />
+                        </div>
+                        <h4 className="font-semibold text-white">Server Status</h4>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Platform</span>
+                          <span className="text-white">Next.js 13</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Environment</span>
+                          <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30">Production</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Uptime</span>
+                          <span className="text-white">99.9%</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
